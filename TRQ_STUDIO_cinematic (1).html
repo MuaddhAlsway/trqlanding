@@ -1,0 +1,1040 @@
+
+<h2 class="sr-only">TRQ Studio — Cinematic Architecture Landing Page with Three.js and GSAP</h2>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,100;0,200;0,300;0,400;0,700;0,900;1,300&display=swap');
+
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#050505;--bg2:#0a0a0a;--bg3:#111;
+  --white:#F5F4F0;--silver:#A8A89E;--gold:#C9A96E;--concrete:#6B6B65;
+}
+html,body{background:var(--bg);color:var(--white);font-family:'Barlow',sans-serif;overflow-x:hidden;}
+#trq-root{position:relative;}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 48px;
+  transition:background .6s,backdrop-filter .6s;
+}
+#nav.scrolled{background:rgba(5,5,5,.92);backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.05);}
+.nav-logo{font-size:18px;font-weight:900;letter-spacing:.12em;}
+.nav-logo span{color:var(--gold);}
+.nav-links{display:flex;gap:36px;}
+.nav-links a{font-size:10px;letter-spacing:.28em;color:var(--concrete);text-decoration:none;text-transform:uppercase;transition:color .3s;}
+.nav-links a:hover{color:var(--white);}
+.nav-coord{font-size:10px;letter-spacing:.22em;color:var(--concrete);}
+
+/* ── PRELOADER ── */
+#preloader{
+  position:fixed;inset:0;z-index:1000;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.pre-logo{font-size:clamp(80px,16vw,200px);font-weight:900;letter-spacing:-.06em;color:var(--white);line-height:1;transform:scale(.6);opacity:0;}
+.pre-sub{font-size:11px;letter-spacing:.55em;color:var(--concrete);margin-top:8px;opacity:0;}
+.pre-bar-wrap{width:240px;height:1px;background:rgba(255,255,255,.06);margin-top:48px;position:relative;}
+.pre-bar{position:absolute;left:0;top:0;height:100%;background:var(--gold);width:0%;}
+.pre-pct{font-size:10px;letter-spacing:.3em;color:var(--concrete);margin-top:18px;}
+.pre-grid{position:absolute;inset:0;opacity:.05;pointer-events:none;}
+
+/* ── HERO ── */
+#hero{height:100vh;position:relative;overflow:hidden;}
+#three-canvas{position:absolute;inset:0;width:100%;height:100%;}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(5,5,5,.7) 80%,var(--bg) 100%);pointer-events:none;}
+.hero-content{position:absolute;bottom:0;left:0;right:0;padding:clamp(32px,6vw,80px);}
+.hero-eyebrow{font-size:10px;letter-spacing:.42em;color:var(--gold);margin-bottom:28px;display:flex;align-items:center;gap:16px;opacity:0;}
+.hero-eyebrow-line{display:inline-block;width:40px;height:1px;background:var(--gold);}
+.hero-words{overflow:hidden;}
+.hero-word{display:block;font-size:clamp(72px,12vw,180px);font-weight:900;letter-spacing:-.05em;line-height:.9;transform:translateY(120%);opacity:0;}
+.hero-word:nth-child(2){color:var(--silver);}
+.hero-word:nth-child(3){color:var(--concrete);}
+.hero-meta{margin-top:40px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid rgba(255,255,255,.06);padding-top:24px;opacity:0;}
+.hero-desc{font-size:12px;color:var(--concrete);line-height:1.8;max-width:300px;font-weight:300;}
+.hero-stats{display:flex;gap:40px;}
+.hero-stat-num{font-size:28px;font-weight:800;color:var(--white);letter-spacing:-.03em;display:block;}
+.hero-stat-lab{font-size:9px;letter-spacing:.22em;color:var(--concrete);text-transform:uppercase;}
+.scroll-hint{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;}
+.scroll-line{width:1px;height:56px;background:linear-gradient(var(--white),transparent);animation:scrollPulse 2s ease-in-out infinite;}
+.scroll-txt{font-size:9px;letter-spacing:.38em;color:var(--concrete);}
+
+/* ── SECTIONS ── */
+section{position:relative;}
+.section-pad{padding:clamp(80px,12vw,160px) clamp(32px,8vw,120px);}
+.section-eyebrow{font-size:10px;letter-spacing:.42em;color:var(--gold);margin-bottom:56px;display:flex;align-items:center;gap:16px;}
+.section-eyebrow-line{display:inline-block;width:40px;height:1px;background:var(--gold);}
+.section-title{font-size:clamp(44px,7vw,96px);font-weight:900;letter-spacing:-.04em;line-height:.95;margin-bottom:0;}
+
+/* ── MANIFESTO ── */
+#manifesto{background:var(--bg);}
+.manifesto-lines{max-width:960px;}
+.manifesto-line{overflow:hidden;margin-bottom:40px;}
+.manifesto-inner{font-size:clamp(28px,4vw,58px);letter-spacing:-.025em;line-height:1.1;transform:translateY(100%);opacity:0;}
+.manifesto-inner.light{font-weight:300;color:var(--white);}
+.manifesto-inner.bold{font-weight:900;color:var(--white);}
+.manifesto-inner.dim{font-weight:300;color:var(--silver);}
+.manifesto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.05);margin-top:80px;}
+.manifesto-cell{padding:48px 32px;background:var(--bg);}
+.manifesto-cell-title{font-size:10px;letter-spacing:.35em;color:var(--gold);margin-bottom:18px;}
+.manifesto-cell-body{font-size:13px;color:var(--concrete);line-height:1.75;font-weight:300;}
+
+/* ── 3D SECTION ── */
+#arch3d{height:100vh;position:relative;overflow:hidden;}
+#arch3d-canvas{position:absolute;inset:0;width:100%;height:100%;}
+.arch3d-overlay{position:absolute;inset:0;background:linear-gradient(to right,rgba(5,5,5,.75) 30%,transparent 70%);pointer-events:none;}
+.arch3d-content{position:absolute;top:50%;left:clamp(32px,8vw,120px);transform:translateY(-50%);}
+.arch3d-label{font-size:10px;letter-spacing:.42em;color:var(--gold);margin-bottom:24px;}
+.arch3d-title{font-size:clamp(40px,6vw,80px);font-weight:900;letter-spacing:-.04em;line-height:.95;color:var(--white);margin-bottom:24px;}
+.arch3d-body{font-size:13px;color:var(--concrete);line-height:1.8;max-width:280px;font-weight:300;}
+
+/* ── PROJECTS ── */
+#projects{background:var(--bg2);overflow:hidden;}
+.projects-track{display:flex;gap:16px;padding:0 clamp(32px,8vw,120px) 0;will-change:transform;}
+.project-card{
+  min-width:clamp(260px,30vw,400px);height:500px;
+  background:var(--bg3);border:1px solid rgba(255,255,255,.05);
+  position:relative;overflow:hidden;flex-shrink:0;cursor:crosshair;
+  transition:border-color .6s,transform .6s cubic-bezier(.16,1,.3,1);
+}
+.project-card:hover{border-color:rgba(201,169,110,.3);transform:translateY(-10px) scale(1.01);}
+.project-card-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:36px 36px;opacity:.5;transition:opacity .5s;}
+.project-card:hover .project-card-grid{opacity:1;}
+.project-card-glow{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 90%,rgba(201,169,110,.07) 0%,transparent 70%);opacity:0;transition:opacity .6s;}
+.project-card:hover .project-card-glow{opacity:1;}
+.project-card-inner{padding:32px;height:100%;display:flex;flex-direction:column;justify-content:space-between;position:relative;}
+.project-num{font-size:10px;letter-spacing:.3em;color:var(--gold);margin-bottom:20px;}
+.project-bar{width:36%;height:1px;background:rgba(201,169,110,.5);margin-bottom:16px;transition:width .7s cubic-bezier(.16,1,.3,1);}
+.project-card:hover .project-bar{width:100%;}
+.project-geo{flex:1;display:flex;align-items:center;justify-content:center;}
+.project-square{width:100px;height:100px;border:1px solid rgba(255,255,255,.08);transition:transform 1s cubic-bezier(.16,1,.3,1),border-color .5s;}
+.project-card:hover .project-square{transform:rotate(45deg) scale(1.2);border-color:rgba(201,169,110,.25);}
+.project-diamond{position:absolute;width:50px;height:50px;background:rgba(201,169,110,.05);transition:transform 1.2s cubic-bezier(.16,1,.3,1);}
+.project-card:hover .project-diamond{transform:rotate(-25deg) scale(1.4);}
+.project-title{font-size:clamp(20px,2.5vw,28px);font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-bottom:14px;}
+.project-footer{display:flex;justify-content:space-between;align-items:flex-end;}
+.project-loc{font-size:12px;color:var(--silver);letter-spacing:.08em;}
+.project-year{font-size:10px;color:var(--concrete);letter-spacing:.2em;}
+
+/* ── MATERIALS ── */
+#materials{background:var(--bg);}
+#mat-canvas-wrap{height:480px;position:relative;overflow:hidden;background:var(--bg3);}
+#mat-canvas{width:100%;height:100%;display:block;}
+.mat-canvas-label{position:absolute;bottom:24px;left:24px;}
+.mat-canvas-eyebrow{font-size:9px;letter-spacing:.35em;color:var(--gold);margin-bottom:8px;}
+.mat-canvas-name{font-size:26px;font-weight:800;letter-spacing:-.02em;color:var(--white);text-transform:uppercase;}
+.mat-selector{display:flex;flex-direction:column;gap:2px;}
+.mat-btn{
+  flex:1;padding:24px 32px;background:var(--bg2);cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  border-left:2px solid transparent;transition:all .35s;border-bottom:1px solid rgba(255,255,255,.03);
+}
+.mat-btn.active{background:var(--bg3);border-left-color:var(--gold);}
+.mat-btn-name{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--concrete);transition:color .3s;}
+.mat-btn.active .mat-btn-name{color:var(--white);}
+.mat-btn-tag{font-size:10px;letter-spacing:.3em;color:transparent;transition:color .3s;}
+.mat-btn.active .mat-btn-tag{color:var(--gold);}
+
+/* ── METRICS ── */
+#metrics{background:var(--bg);}
+.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.04);}
+.metric-cell{padding:60px 20px;text-align:center;background:var(--bg);}
+.metric-num{font-size:clamp(56px,8vw,110px);font-weight:900;color:var(--white);letter-spacing:-.04em;line-height:1;font-family:'Barlow',serif;}
+.metric-lab{font-size:10px;letter-spacing:.28em;color:var(--concrete);text-transform:uppercase;margin-top:10px;}
+
+/* ── CTA ── */
+#cta{height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+#cta-canvas{position:absolute;inset:0;width:100%;height:100%;}
+.cta-overlay{position:absolute;inset:0;background:linear-gradient(transparent 0%,rgba(5,5,5,.8) 50%,var(--bg) 100%);}
+.cta-content{position:relative;padding:0 40px;}
+.cta-title{font-size:clamp(36px,7vw,100px);font-weight:900;letter-spacing:-.04em;line-height:.95;overflow:hidden;display:block;}
+.cta-title span{display:block;transform:translateY(110%);opacity:0;}
+.cta-actions{margin-top:64px;display:flex;gap:24px;justify-content:center;align-items:center;opacity:0;}
+.cta-btn{
+  padding:16px 52px;border:1px solid var(--white);color:var(--white);
+  font-size:11px;letter-spacing:.3em;text-transform:uppercase;text-decoration:none;
+  transition:all .4s;cursor:pointer;background:transparent;font-family:'Barlow',sans-serif;
+}
+.cta-btn:hover{background:var(--white);color:var(--bg);}
+.cta-email{font-size:11px;letter-spacing:.2em;color:var(--concrete);}
+
+/* ── FOOTER ── */
+footer{padding:36px clamp(32px,8vw,120px);border-top:1px solid rgba(255,255,255,.05);display:flex;justify-content:space-between;align-items:center;background:var(--bg);}
+.footer-logo{font-size:15px;font-weight:900;letter-spacing:.12em;}
+.footer-logo span{color:var(--gold);}
+.footer-copy{font-size:10px;color:var(--concrete);letter-spacing:.2em;}
+.footer-coord{font-size:10px;color:var(--concrete);letter-spacing:.16em;}
+
+/* ── GRAIN ── */
+#grain{position:fixed;inset:0;pointer-events:none;z-index:998;mix-blend-mode:screen;opacity:.55;}
+
+/* ── CURSOR ── */
+#cursor{width:8px;height:8px;background:var(--gold);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,width .3s,height .3s,opacity .3s;mix-blend-mode:difference;}
+#cursor-ring{width:36px;height:36px;border:1px solid rgba(201,169,110,.5);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .18s cubic-bezier(.16,1,.3,1);}
+
+@keyframes scrollPulse{0%,100%{opacity:.3;transform:scaleY(1);}50%{opacity:1;transform:scaleY(1.3);}}
+::-webkit-scrollbar{width:0;}
+</style>
+
+<!-- GRAIN CANVAS -->
+<canvas id="grain"></canvas>
+<!-- CURSOR -->
+<div id="cursor"></div><div id="cursor-ring"></div>
+
+<div id="trq-root">
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <svg class="pre-grid" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid slice">
+    <g stroke="rgba(120,180,255,1)" stroke-width="0.5" fill="none">
+      <!-- vertical -->
+      <line x1="50" y1="0" x2="50" y2="600"/><line x1="150" y1="0" x2="150" y2="600"/><line x1="250" y1="0" x2="250" y2="600"/><line x1="350" y1="0" x2="350" y2="600"/><line x1="450" y1="0" x2="450" y2="600"/><line x1="550" y1="0" x2="550" y2="600"/><line x1="650" y1="0" x2="650" y2="600"/><line x1="750" y1="0" x2="750" y2="600"/><line x1="850" y1="0" x2="850" y2="600"/><line x1="950" y1="0" x2="950" y2="600"/>
+      <!-- horizontal -->
+      <line x1="0" y1="60" x2="1000" y2="60"/><line x1="0" y1="150" x2="1000" y2="150"/><line x1="0" y1="250" x2="1000" y2="250"/><line x1="0" y1="350" x2="1000" y2="350"/><line x1="0" y1="450" x2="1000" y2="450"/><line x1="0" y1="540" x2="1000" y2="540"/>
+      <!-- circles -->
+      <circle cx="500" cy="300" r="200"/><circle cx="500" cy="300" r="100"/><circle cx="500" cy="300" r="300"/>
+      <line x1="300" y1="300" x2="700" y2="300"/><line x1="500" y1="100" x2="500" y2="500"/>
+      <line x1="358" y1="158" x2="642" y2="442"/><line x1="642" y1="158" x2="358" y2="442"/>
+    </g>
+  </svg>
+  <div class="pre-logo" id="pre-logo">TRQ</div>
+  <div class="pre-sub" id="pre-sub">STUDIO</div>
+  <div class="pre-bar-wrap"><div class="pre-bar" id="pre-bar"></div></div>
+  <div class="pre-pct" id="pre-pct">000 / 100</div>
+</div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">TRQ<span>.</span></div>
+  <div class="nav-links">
+    <a href="#">Work</a><a href="#">Philosophy</a><a href="#">Materials</a><a href="#">Studio</a><a href="#">Contact</a>
+  </div>
+  <div class="nav-coord">KSA — 2025</div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <canvas id="three-canvas"></canvas>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" id="hero-eyebrow">
+      <span class="hero-eyebrow-line"></span>
+      ARCHITECTURE STUDIO — RIYADH
+    </div>
+    <div class="hero-words" id="hero-words">
+      <span class="hero-word">SPACE.</span>
+      <span class="hero-word">FORM.</span>
+      <span class="hero-word">SILENCE.</span>
+    </div>
+    <div class="hero-meta" id="hero-meta">
+      <div class="hero-desc">We design architecture that operates at the intersection of material truth and spatial silence.</div>
+      <div class="hero-stats">
+        <div><span class="hero-stat-num">47</span><span class="hero-stat-lab">Projects</span></div>
+        <div><span class="hero-stat-num">12</span><span class="hero-stat-lab">Cities</span></div>
+        <div><span class="hero-stat-num">08</span><span class="hero-stat-lab">Years</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-hint" id="scroll-hint">
+    <div class="scroll-line"></div>
+    <div class="scroll-txt">SCROLL</div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section id="manifesto" class="section-pad" data-bg="var(--bg)">
+  <div class="section-eyebrow"><span class="section-eyebrow-line"></span>MANIFESTO</div>
+  <div class="manifesto-lines">
+    <div class="manifesto-line"><div class="manifesto-inner light" data-reveal>We believe architecture is the art of organized silence.</div></div>
+    <div class="manifesto-line"><div class="manifesto-inner bold" data-reveal>Structure is not decoration.</div></div>
+    <div class="manifesto-line"><div class="manifesto-inner dim" data-reveal>Mass is not weight.</div></div>
+    <div class="manifesto-line"><div class="manifesto-inner bold" data-reveal>Light is the only material that matters.</div></div>
+  </div>
+  <div class="manifesto-grid">
+    <div class="manifesto-cell" data-cell>
+      <div class="manifesto-cell-title">PRECISION</div>
+      <div class="manifesto-cell-body">Every dimension is a decision, not a measurement.</div>
+    </div>
+    <div class="manifesto-cell" data-cell>
+      <div class="manifesto-cell-title">RESTRAINT</div>
+      <div class="manifesto-cell-body">We remove until only truth remains in the space.</div>
+    </div>
+    <div class="manifesto-cell" data-cell>
+      <div class="manifesto-cell-title">PERMANENCE</div>
+      <div class="manifesto-cell-body">We build for the next one hundred years.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 3D ARCH SECTION -->
+<section id="arch3d">
+  <canvas id="arch3d-canvas"></canvas>
+  <div class="arch3d-overlay"></div>
+  <div class="arch3d-content" id="arch3d-content">
+    <div class="arch3d-label">ARCHITECTURAL VISION</div>
+    <div class="arch3d-title" id="arch3d-title">THE<br>STRUCTURE<br>SPEAKS.</div>
+    <div class="arch3d-body">Brutalist towers carved from silence. Each vertex a decision. Each face a material truth.</div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" style="padding:clamp(60px,10vw,120px) 0;">
+  <div style="padding:0 clamp(32px,8vw,120px);margin-bottom:48px;display:flex;justify-content:space-between;align-items:flex-end;">
+    <div>
+      <div class="section-eyebrow"><span class="section-eyebrow-line"></span>SELECTED WORK</div>
+      <div class="section-title" id="projects-title">PROJECTS.</div>
+    </div>
+    <div style="font-size:12px;color:var(--concrete);letter-spacing:.1em;">5 / 5</div>
+  </div>
+  <div class="projects-track" id="projects-track">
+    <div class="project-card"><div class="project-card-grid"></div><div class="project-card-glow"></div><div class="project-card-inner"><div><div class="project-num">01 — COMMERCIAL</div><div class="project-bar"></div></div><div class="project-geo"><div style="position:relative;display:flex;align-items:center;justify-content:center;"><div class="project-square"></div><div class="project-diamond"></div></div></div><div><div class="project-title">Horizon Tower</div><div class="project-footer"><span class="project-loc">Riyadh, KSA</span><span class="project-year">2024</span></div></div></div></div>
+    <div class="project-card"><div class="project-card-grid"></div><div class="project-card-glow"></div><div class="project-card-inner"><div><div class="project-num">02 — CULTURAL</div><div class="project-bar"></div></div><div class="project-geo"><div style="position:relative;display:flex;align-items:center;justify-content:center;"><div class="project-square"></div><div class="project-diamond"></div></div></div><div><div class="project-title">Void Pavilion</div><div class="project-footer"><span class="project-loc">AlUla, KSA</span><span class="project-year">2024</span></div></div></div></div>
+    <div class="project-card"><div class="project-card-grid"></div><div class="project-card-glow"></div><div class="project-card-inner"><div><div class="project-num">03 — RESIDENTIAL</div><div class="project-bar"></div></div><div class="project-geo"><div style="position:relative;display:flex;align-items:center;justify-content:center;"><div class="project-square"></div><div class="project-diamond"></div></div></div><div><div class="project-title">Mass Residence</div><div class="project-footer"><span class="project-loc">Jeddah, KSA</span><span class="project-year">2023</span></div></div></div></div>
+    <div class="project-card"><div class="project-card-grid"></div><div class="project-card-glow"></div><div class="project-card-inner"><div><div class="project-num">04 — CIVIC</div><div class="project-bar"></div></div><div class="project-geo"><div style="position:relative;display:flex;align-items:center;justify-content:center;"><div class="project-square"></div><div class="project-diamond"></div></div></div><div><div class="project-title">Silence Museum</div><div class="project-footer"><span class="project-loc">Diriyah, KSA</span><span class="project-year">2023</span></div></div></div></div>
+    <div class="project-card"><div class="project-card-grid"></div><div class="project-card-glow"></div><div class="project-card-inner"><div><div class="project-num">05 — INFRASTRUCTURE</div><div class="project-bar"></div></div><div class="project-geo"><div style="position:relative;display:flex;align-items:center;justify-content:center;"><div class="project-square"></div><div class="project-diamond"></div></div></div><div><div class="project-title">Monolith Gate</div><div class="project-footer"><span class="project-loc">NEOM, KSA</span><span class="project-year">2025</span></div></div></div></div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section id="metrics">
+  <div class="metrics-grid">
+    <div class="metric-cell"><div class="metric-num" data-count="47" data-suffix="">0</div><div class="metric-lab">Projects Completed</div></div>
+    <div class="metric-cell"><div class="metric-num" data-count="12" data-suffix="+">0</div><div class="metric-lab">Countries</div></div>
+    <div class="metric-cell"><div class="metric-num" data-count="2.4" data-suffix="M+">0</div><div class="metric-lab">Square Meters</div></div>
+    <div class="metric-cell"><div class="metric-num" data-count="180" data-suffix="+">0</div><div class="metric-lab">Collaborators</div></div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section id="cta">
+  <canvas id="cta-canvas"></canvas>
+  <div class="cta-overlay"></div>
+  <div class="cta-content">
+    <span class="cta-title"><span id="cta-line1">BEGIN THE</span></span>
+    <span class="cta-title"><span id="cta-line2">CONVERSATION.</span></span>
+    <div class="cta-actions" id="cta-actions">
+      <button class="cta-btn">INITIATE</button>
+      <div class="cta-email">studio@trqstudio.com</div>
+    </div>
+    <div style="margin-top:72px;font-size:10px;letter-spacing:.3em;color:rgba(107,107,101,.5);opacity:0;" id="cta-sub">TRQ STUDIO — RIYADH, KINGDOM OF SAUDI ARABIA</div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">TRQ<span>.</span></div>
+  <div class="footer-copy">© 2025 TRQ STUDIO. ALL RIGHTS RESERVED.</div>
+  <div class="footer-coord">21°29'N  39°11'E</div>
+</footer>
+
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<script>
+(function(){
+const C = {bg:'#050505',bg2:'#0a0a0a',white:'#F5F4F0',silver:'#A8A89E',gold:'#C9A96E',concrete:'#6B6B65'};
+
+// ── GRAIN ──────────────────────────────────────────────────────────────
+const grain = document.getElementById('grain');
+const gctx = grain.getContext('2d');
+let graf;
+function drawGrain(){
+  grain.width = window.innerWidth; grain.height = window.innerHeight;
+  const id = gctx.createImageData(grain.width>>1, grain.height>>1);
+  const d = id.data;
+  for(let i=0;i<d.length;i+=4){
+    const v=(Math.random()*255)|0;
+    d[i]=v;d[i+1]=v;d[i+2]=v;
+    d[i+3]=Math.random()<.018?20:0;
+  }
+  gctx.putImageData(id,0,0);
+  gctx.drawImage(grain,0,0,grain.width>>1,grain.height>>1,0,0,grain.width,grain.height);
+  graf=requestAnimationFrame(drawGrain);
+}
+drawGrain();
+
+// ── CURSOR ─────────────────────────────────────────────────────────────
+const cur=document.getElementById('cursor'), curR=document.getElementById('cursor-ring');
+let mx=0,my=0,rx=0,ry=0;
+window.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+(function animCur(){
+  rx+=(mx-rx)*.12; ry+=(my-ry)*.12;
+  curR.style.left=rx+'px'; curR.style.top=ry+'px';
+  requestAnimationFrame(animCur);
+})();
+
+// ── PRELOADER ──────────────────────────────────────────────────────────
+gsap.registerPlugin(ScrollTrigger);
+const preBar=document.getElementById('pre-bar');
+const prePct=document.getElementById('pre-pct');
+const preLogo=document.getElementById('pre-logo');
+const preSub=document.getElementById('pre-sub');
+
+gsap.to(preLogo,{opacity:1,scale:1,duration:1.2,ease:'expo.out',delay:.3});
+gsap.to(preSub,{opacity:1,duration:.8,delay:.8});
+
+let pct=0;
+const pInt=setInterval(()=>{
+  pct+=Math.random()*10+4;
+  if(pct>=100){pct=100;clearInterval(pInt);
+    setTimeout(()=>{
+      const tl=gsap.timeline();
+      tl.to('#preloader',{opacity:0,duration:.8,ease:'power2.inOut',
+        onComplete:()=>{document.getElementById('preloader').style.display='none';}
+      });
+      tl.call(()=>initHeroAnims(),null,'<.2');
+    },400);
+  }
+  preBar.style.width=pct+'%';
+  prePct.textContent=String(Math.round(pct)).padStart(3,'0')+' / 100';
+},80);
+
+// ── THREE.JS HERO SCENE ────────────────────────────────────────────────
+const heroCanvas=document.getElementById('three-canvas');
+const renderer=new THREE.WebGLRenderer({canvas:heroCanvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(window.innerWidth,window.innerHeight);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=0.7;
+
+const scene=new THREE.Scene();
+scene.fog=new THREE.FogExp2(0x050505,0.018);
+scene.background=new THREE.Color(0x050505);
+
+const camera=new THREE.PerspectiveCamera(55,window.innerWidth/window.innerHeight,.1,500);
+camera.position.set(0,8,40);
+camera.lookAt(0,5,0);
+
+// Lighting rig
+const ambient=new THREE.AmbientLight(0x111111,2);
+scene.add(ambient);
+
+const keyLight=new THREE.DirectionalLight(0xF5F0E8,3);
+keyLight.position.set(20,40,10);
+keyLight.castShadow=true;
+keyLight.shadow.mapSize.set(2048,2048);
+keyLight.shadow.camera.far=200;
+scene.add(keyLight);
+
+const fillLight=new THREE.DirectionalLight(0x4466AA,0.8);
+fillLight.position.set(-20,10,-10);
+scene.add(fillLight);
+
+const rimLight=new THREE.DirectionalLight(0xC9A96E,1.2);
+rimLight.position.set(0,20,-30);
+scene.add(rimLight);
+
+// Ground plane — reflective
+const groundGeo=new THREE.PlaneGeometry(400,400);
+const groundMat=new THREE.MeshStandardMaterial({
+  color:0x080808, metalness:.9, roughness:.2,
+  envMapIntensity:0.5
+});
+const ground=new THREE.Mesh(groundGeo,groundMat);
+ground.rotation.x=-Math.PI/2;
+ground.position.y=0;
+ground.receiveShadow=true;
+scene.add(ground);
+
+// Grid lines on ground
+const gridHelper=new THREE.GridHelper(200,60,0x1a1a1a,0x111111);
+gridHelper.position.y=.01;
+scene.add(gridHelper);
+
+// ── BRUTALIST TOWERS ──────────────────────────────────────────────────
+const matConcrete=new THREE.MeshStandardMaterial({color:0x3a3a36,roughness:.95,metalness:.05});
+const matGlass=new THREE.MeshStandardMaterial({color:0x1a2030,roughness:.05,metalness:.9,transparent:true,opacity:.7});
+const matSteel=new THREE.MeshStandardMaterial({color:0x4a4a50,roughness:.3,metalness:.9});
+const matDark=new THREE.MeshStandardMaterial({color:0x111110,roughness:.8,metalness:.1});
+
+function makeTower(x,z,w,d,floors,mat,winMat){
+  const group=new THREE.Group();
+  const totalH=floors*.9;
+
+  // Base slab
+  const base=new THREE.Mesh(new THREE.BoxGeometry(w+1,0.8,d+1),matDark);
+  base.position.y=0.4; base.castShadow=true; base.receiveShadow=true;
+  group.add(base);
+
+  // Main body — segmented brutalist
+  const segH=.9;
+  for(let f=0;f<floors;f++){
+    const inset=(f%3===0)?0.12:0;
+    const bw=w-inset, bd=d-inset;
+    const geo=new THREE.BoxGeometry(bw,segH-.04,bd);
+    const m=f%5===0?matGlass:mat;
+    const seg=new THREE.Mesh(geo,m);
+    seg.position.y=f*segH+segH/2+.8;
+    seg.castShadow=true; seg.receiveShadow=true;
+    group.add(seg);
+
+    // Horizontal band every 4 floors
+    if(f%4===0&&f>0){
+      const band=new THREE.Mesh(new THREE.BoxGeometry(w+.3,0.12,d+.3),matSteel);
+      band.position.y=f*segH+.8;
+      group.add(band);
+    }
+  }
+
+  // Crown
+  const crown=new THREE.Mesh(new THREE.BoxGeometry(w*.7,.3,d*.7),matSteel);
+  crown.position.y=floors*segH+.95;
+  group.add(crown);
+
+  group.position.set(x,0,z);
+  // Start below ground, animate up
+  group.userData.targetY=0;
+  group.position.y=-totalH;
+  return group;
+}
+
+const towers=[];
+const tDefs=[
+  {x:-18,z:-8,w:4,d:4,f:20,mat:matConcrete},
+  {x:-10,z:-2,w:6,d:5,f:28,mat:matDark},
+  {x:0,z:0,w:8,d:6,f:38,mat:matConcrete},
+  {x:12,z:-4,w:5,d:5,f:24,mat:matDark},
+  {x:22,z:-10,w:3,d:3,f:16,mat:matConcrete},
+  {x:-28,z:-16,w:3,d:3,f:12,mat:matDark},
+  {x:30,z:-18,w:4,d:3,f:14,mat:matConcrete},
+  {x:6,z:16,w:5,d:4,f:18,mat:matDark},
+  {x:-14,z:20,w:3,d:3,f:10,mat:matConcrete},
+  {x:20,z:18,w:4,d:4,f:22,mat:matDark},
+];
+tDefs.forEach(({x,z,w,d,f,mat})=>{
+  const t=makeTower(x,z,w,d,f,mat,matGlass);
+  scene.add(t);
+  towers.push(t);
+});
+
+// Particle system — dust/debris
+const pGeo=new THREE.BufferGeometry();
+const pCount=1200;
+const pPos=new Float32Array(pCount*3);
+for(let i=0;i<pCount;i++){
+  pPos[i*3]=(Math.random()-.5)*120;
+  pPos[i*3+1]=Math.random()*60;
+  pPos[i*3+2]=(Math.random()-.5)*80;
+}
+pGeo.setAttribute('position',new THREE.BufferAttribute(pPos,3));
+const pMat=new THREE.PointsMaterial({color:0xA8A89E,size:.12,transparent:true,opacity:.4,sizeAttenuation:true});
+const particles=new THREE.Points(pGeo,pMat);
+scene.add(particles);
+
+// Floating geometric elements — architectural fragments
+function makeFragment(x,y,z,s){
+  const shapes=[
+    new THREE.BoxGeometry(s,s*.2,s),
+    new THREE.BoxGeometry(s*.2,s*2,s*.2),
+    new THREE.BoxGeometry(s,s,s*.1),
+  ];
+  const geo=shapes[Math.floor(Math.random()*shapes.length)];
+  const mesh=new THREE.Mesh(geo,matSteel);
+  mesh.position.set(x,y,z);
+  mesh.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI);
+  mesh.userData.rotSpeed={x:(Math.random()-.5)*.003,y:(Math.random()-.5)*.005};
+  mesh.userData.floatOffset=Math.random()*Math.PI*2;
+  scene.add(mesh);
+  return mesh;
+}
+const fragments=[];
+for(let i=0;i<18;i++){
+  fragments.push(makeFragment(
+    (Math.random()-.5)*80, Math.random()*40+2, (Math.random()-.5)*60,
+    .3+Math.random()*.8
+  ));
+}
+
+// ── CAMERA TARGETS ─────────────────────────────────────────────────────
+const camTargets=[
+  {pos:{x:0,y:8,z:40},  look:{x:0,y:12,z:0}},   // hero
+  {pos:{x:20,y:15,z:25}, look:{x:0,y:10,z:0}},   // right sweep
+  {pos:{x:-12,y:4,z:10}, look:{x:4,y:14,z:-5}},  // close-up
+  {pos:{x:0,y:30,z:15},  look:{x:0,y:0,z:0}},    // aerial
+  {pos:{x:8,y:2,z:30},   look:{x:0,y:20,z:0}},   // ground level
+];
+let camT=0, camNext=1;
+
+// Scroll camera rig
+const camState={progress:0,mouseX:0,mouseY:0};
+window.addEventListener('mousemove',e=>{
+  camState.mouseX=(e.clientX/window.innerWidth-.5)*2;
+  camState.mouseY=-(e.clientY/window.innerHeight-.5)*2;
+});
+
+// THREE.JS RENDER LOOP
+let heroT=0;
+function renderHero(){
+  heroT+=.008;
+
+  // Animate towers rising
+  towers.forEach((t,i)=>{
+    if(t.position.y<0){
+      t.position.y=Math.min(0,t.position.y+.15+i*.02);
+    }
+  });
+
+  // Float fragments
+  fragments.forEach(f=>{
+    f.rotation.x+=f.userData.rotSpeed.x;
+    f.rotation.y+=f.userData.rotSpeed.y;
+    f.position.y+=Math.sin(heroT+f.userData.floatOffset)*.008;
+  });
+
+  // Drift particles
+  const pp=particles.geometry.attributes.position.array;
+  for(let i=1;i<pCount*3;i+=3){
+    pp[i]+=.008;
+    if(pp[i]>65){pp[i]=-2;}
+  }
+  particles.geometry.attributes.position.needsUpdate=true;
+
+  // Mouse parallax on camera
+  const basePos=camTargets[camT];
+  const nextPos=camTargets[camNext];
+  const lp=camState.progress;
+  camera.position.x=basePos.pos.x+(nextPos.pos.x-basePos.pos.x)*lp + camState.mouseX*3;
+  camera.position.y=basePos.pos.y+(nextPos.pos.y-basePos.pos.y)*lp + camState.mouseY*1.5;
+  camera.position.z=basePos.pos.z+(nextPos.pos.z-basePos.pos.z)*lp;
+
+  const lx=basePos.look.x+(nextPos.look.x-basePos.look.x)*lp;
+  const ly=basePos.look.y+(nextPos.look.y-basePos.look.y)*lp;
+  camera.lookAt(lx,ly,0);
+
+  // Subtle key light sweep
+  keyLight.position.x=20+Math.sin(heroT*.3)*8;
+
+  renderer.render(scene,camera);
+  requestAnimationFrame(renderHero);
+}
+renderHero();
+
+// ── 3D SECOND SCENE (arch3d) ───────────────────────────────────────────
+const a3canvas=document.getElementById('arch3d-canvas');
+const a3r=new THREE.WebGLRenderer({canvas:a3canvas,antialias:true,alpha:true});
+a3r.setPixelRatio(Math.min(devicePixelRatio,2));
+a3r.setSize(window.innerWidth,window.innerHeight);
+a3r.toneMapping=THREE.ACESFilmicToneMapping;
+a3r.toneMappingExposure=0.6;
+
+const a3scene=new THREE.Scene();
+a3scene.fog=new THREE.FogExp2(0x050505,.025);
+a3scene.background=new THREE.Color(0x050505);
+
+const a3cam=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,.1,300);
+a3cam.position.set(-5,12,28);
+a3cam.lookAt(0,8,0);
+
+const a3amb=new THREE.AmbientLight(0x0a0a0a,3);
+a3scene.add(a3amb);
+const a3key=new THREE.DirectionalLight(0xF5F0E8,4);
+a3key.position.set(15,30,5);
+a3scene.add(a3key);
+const a3rim=new THREE.DirectionalLight(0xC9A96E,1.5);
+a3rim.position.set(-10,5,-20);
+a3scene.add(a3rim);
+
+// Ground
+const a3ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0x060606,metalness:.8,roughness:.3}));
+a3ground.rotation.x=-Math.PI/2;
+a3scene.add(a3ground);
+const a3grid=new THREE.GridHelper(200,50,0x111111,0x0c0c0c);
+a3grid.position.y=.01;
+a3scene.add(a3grid);
+
+// Single mega-tower — hero structure
+const megaGroup=new THREE.Group();
+
+// Base plinth
+const plinth=new THREE.Mesh(new THREE.BoxGeometry(14,1,14),new THREE.MeshStandardMaterial({color:0x1a1a18,roughness:.9,metalness:.1}));
+plinth.position.y=.5;
+megaGroup.add(plinth);
+
+// Tower body — stepped brutalist
+const stepDefs=[
+  {w:12,d:10,h:8,y:5},{w:10,d:8,h:10,y:14},{w:8,d:7,h:12,y:26},{w:6,d:5,h:14,y:40},{w:4,d:3,h:8,y:55}
+];
+stepDefs.forEach(({w,d,h,y})=>{
+  const geo=new THREE.BoxGeometry(w,h,d);
+  const mat=new THREE.MeshStandardMaterial({color:0x2e2e2a,roughness:.9,metalness:.05});
+  const m=new THREE.Mesh(geo,mat);
+  m.position.y=y;
+  m.castShadow=true;
+  megaGroup.add(m);
+  // glass strip
+  const gstrip=new THREE.Mesh(new THREE.BoxGeometry(w+.1,.5,d+.1),new THREE.MeshStandardMaterial({color:0x1a2535,roughness:.05,metalness:.95,transparent:true,opacity:.8}));
+  gstrip.position.y=y+h/2-.25;
+  megaGroup.add(gstrip);
+});
+
+// Crown spire
+const spire=new THREE.Mesh(new THREE.CylinderGeometry(.15,.8,12,8),new THREE.MeshStandardMaterial({color:0x3a3a38,roughness:.7,metalness:.3}));
+spire.position.y=67;
+megaGroup.add(spire);
+
+// Horizontal fins
+for(let i=0;i<8;i++){
+  const fin=new THREE.Mesh(new THREE.BoxGeometry(16,.15,1),new THREE.MeshStandardMaterial({color:0x4a4a46,roughness:.4,metalness:.7}));
+  fin.position.y=4+i*8;
+  fin.position.z=5.5;
+  megaGroup.add(fin);
+  const fin2=fin.clone();
+  fin2.position.z=-5.5;
+  megaGroup.add(fin2);
+}
+
+a3scene.add(megaGroup);
+megaGroup.position.y=-80; // start below
+
+// Flanking towers
+[-18,16].forEach((x,i)=>{
+  const fg=new THREE.Group();
+  const t=new THREE.Mesh(new THREE.BoxGeometry(4,30+i*8,4),new THREE.MeshStandardMaterial({color:0x1e1e1c,roughness:.95,metalness:.05}));
+  t.position.y=15+i*4;
+  fg.add(t);
+  fg.position.set(x,0,0);
+  fg.position.y=-50;
+  a3scene.add(fg);
+  fg.userData.targetY=0;
+  towers.push(fg);
+});
+
+// A3 particles
+const a3pGeo=new THREE.BufferGeometry();
+const a3pp=new Float32Array(600*3);
+for(let i=0;i<600;i++){a3pp[i*3]=(Math.random()-.5)*80;a3pp[i*3+1]=Math.random()*80;a3pp[i*3+2]=(Math.random()-.5)*60;}
+a3pGeo.setAttribute('position',new THREE.BufferAttribute(a3pp,3));
+const a3parts=new THREE.Points(a3pGeo,new THREE.PointsMaterial({color:0x888880,size:.1,transparent:true,opacity:.35}));
+a3scene.add(a3parts);
+
+let a3t=0;
+function renderA3(){
+  a3t+=.006;
+  // Rise mega tower
+  if(megaGroup.position.y<0) megaGroup.position.y=Math.min(0,megaGroup.position.y+.4);
+  // Orbit cam gently
+  a3cam.position.x=Math.sin(a3t*.15)*6-3;
+  a3cam.position.z=28+Math.cos(a3t*.1)*4;
+  a3cam.lookAt(0,15,0);
+  a3key.position.x=15+Math.sin(a3t*.2)*5;
+  // drift particles
+  const pp2=a3parts.geometry.attributes.position.array;
+  for(let i=1;i<600*3;i+=3){pp2[i]+=.006;if(pp2[i]>80)pp2[i]=0;}
+  a3parts.geometry.attributes.position.needsUpdate=true;
+  a3r.render(a3scene,a3cam);
+  requestAnimationFrame(renderA3);
+}
+renderA3();
+
+// ── CTA SCENE ─────────────────────────────────────────────────────────
+const ctaCanvas=document.getElementById('cta-canvas');
+const ctaR=new THREE.WebGLRenderer({canvas:ctaCanvas,antialias:true,alpha:true});
+ctaR.setPixelRatio(Math.min(devicePixelRatio,2));
+ctaR.setSize(window.innerWidth,window.innerHeight);
+ctaR.toneMapping=THREE.ACESFilmicToneMapping;
+ctaR.toneMappingExposure=.4;
+
+const ctaScene=new THREE.Scene();
+ctaScene.fog=new THREE.FogExp2(0x050505,.04);
+ctaScene.background=new THREE.Color(0x050505);
+
+const ctaCam=new THREE.PerspectiveCamera(60,window.innerWidth/window.innerHeight,.1,200);
+ctaCam.position.set(0,4,20);
+ctaCam.lookAt(0,8,0);
+
+ctaScene.add(new THREE.AmbientLight(0x050505,3));
+const ctaKey=new THREE.DirectionalLight(0xC9A96E,.8);
+ctaKey.position.set(0,20,10);
+ctaScene.add(ctaKey);
+
+// Dissolving tower silhouette
+const ctaTower=new THREE.Mesh(new THREE.BoxGeometry(6,40,4),new THREE.MeshStandardMaterial({color:0x0e0e0c,roughness:1,metalness:.05,transparent:true,opacity:.6}));
+ctaTower.position.y=20;
+ctaScene.add(ctaTower);
+
+const ctaTower2=new THREE.Mesh(new THREE.BoxGeometry(3,25,3),new THREE.MeshStandardMaterial({color:0x0d0d0b,roughness:1,metalness:.05,transparent:true,opacity:.4}));
+ctaTower2.position.set(-10,12,0);
+ctaScene.add(ctaTower2);
+
+let ctaT=0;
+function renderCta(){
+  ctaT+=.004;
+  ctaTower.material.opacity=.3+Math.sin(ctaT)*.1;
+  ctaCam.position.x=Math.sin(ctaT*.08)*2;
+  ctaCam.lookAt(0,12,0);
+  ctaR.render(ctaScene,ctaCam);
+  requestAnimationFrame(renderCta);
+}
+renderCta();
+
+// ── MATERIAL CANVAS (WebGL 2D) ─────────────────────────────────────────
+const matCanvas=document.getElementById('mat-canvas');
+const mgl=matCanvas.getContext('webgl');
+let matActive='concrete', matRaf;
+const matName=document.querySelector('.mat-canvas-name');
+
+const matShaders={
+  concrete:`precision highp float;uniform float u_t;uniform vec2 u_res;
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}
+    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+    void main(){vec2 uv=gl_FragCoord.xy/u_res;float v=n(uv*20.+u_t*.04)+n(uv*40.)*.5+n(uv*80.)*.25;v/=1.75;float cr=smoothstep(.47,.5,n(uv*9.+1.3));vec3 c=mix(vec3(.26,.25,.23),vec3(.40,.39,.37),v);c=mix(c,vec3(.14,.13,.12),cr*.35);gl_FragColor=vec4(c,1.);}`,
+  marble:`precision highp float;uniform float u_t;uniform vec2 u_res;
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}
+    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+    void main(){vec2 uv=gl_FragCoord.xy/u_res;float v=n(uv*5.)+n(uv*10.)*.5+n(uv*20.)*.25;float vn=sin((uv.x+v*2.2+u_t*.015)*14.)*.5+.5;vn=pow(vn,7.);vec3 c=mix(vec3(.85,.83,.79),vec3(.50,.48,.46),vn*.65);gl_FragColor=vec4(c,1.);}`,
+  steel:`precision highp float;uniform float u_t;uniform vec2 u_res;
+    void main(){vec2 uv=gl_FragCoord.xy/u_res;float b=fract(uv.x*48.+u_t*.08);float rf=smoothstep(.38,.62,b)*.18;vec3 c=mix(vec3(.5,.51,.53),vec3(.2,.21,.23),uv.y*.5)+rf;float sc=step(.997,fract(sin(uv.y*340.)*437.5))*.06;c+=sc;gl_FragColor=vec4(c,1.);}`,
+  wood:`precision highp float;uniform float u_t;uniform vec2 u_res;
+    float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}
+    float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+    void main(){vec2 uv=gl_FragCoord.xy/u_res;float v=n(uv*vec2(2.,22.)+u_t*.02)+n(uv*vec2(4.,44.))*.4;float ring=sin((uv.x+v)*32.)*.5+.5;vec3 c=mix(vec3(.36,.22,.10),vec3(.70,.52,.28),ring*.75+uv.y*.25);gl_FragColor=vec4(c,1.);}`,
+  glass:`precision highp float;uniform float u_t;uniform vec2 u_res;
+    void main(){vec2 uv=gl_FragCoord.xy/u_res;vec2 st=uv*2.-1.;float rf=dot(normalize(vec2(1.,.8)),st)*.5+.5;rf=pow(rf,2.2);float edge=1.-smoothstep(0.,.06,min(min(uv.x,1.-uv.x),min(uv.y,1.-uv.y)));vec3 c=mix(vec3(.03,.04,.06),vec3(.5,.55,.62),rf*.3)+edge*.12;float sm=sin(uv.x*10.+u_t*.05)*cos(uv.y*8.-u_t*.04)*.03;c+=sm;gl_FragColor=vec4(c,1.);}`,
+};
+
+let matProg=null, matT=0;
+function buildMatProgram(fSrc){
+  if(matProg) mgl.deleteProgram(matProg);
+  const vs=`attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}`;
+  const mkS=(t,s)=>{const sh=mgl.createShader(t);mgl.shaderSource(sh,s);mgl.compileShader(sh);return sh;};
+  const prog=mgl.createProgram();
+  mgl.attachShader(prog,mkS(mgl.VERTEX_SHADER,vs));
+  mgl.attachShader(prog,mkS(mgl.FRAGMENT_SHADER,fSrc));
+  mgl.linkProgram(prog);
+  return prog;
+}
+function initMat(){
+  const buf=mgl.createBuffer();
+  mgl.bindBuffer(mgl.ARRAY_BUFFER,buf);
+  mgl.bufferData(mgl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),mgl.STATIC_DRAW);
+  matCanvas.width=matCanvas.offsetWidth*2;
+  matCanvas.height=matCanvas.offsetHeight*2;
+  mgl.viewport(0,0,matCanvas.width,matCanvas.height);
+
+  function renderMat(){
+    if(!matProg) matProg=buildMatProgram(matShaders[matActive]||matShaders.concrete);
+    mgl.useProgram(matProg);
+    const pl=mgl.getAttribLocation(matProg,'p');
+    mgl.enableVertexAttribArray(pl);
+    mgl.vertexAttribPointer(pl,2,mgl.FLOAT,false,0,0);
+    mgl.uniform1f(mgl.getUniformLocation(matProg,'u_t'),matT++);
+    mgl.uniform2f(mgl.getUniformLocation(matProg,'u_res'),matCanvas.width,matCanvas.height);
+    mgl.drawArrays(mgl.TRIANGLE_STRIP,0,4);
+    matRaf=requestAnimationFrame(renderMat);
+  }
+  renderMat();
+}
+initMat();
+
+document.querySelectorAll('.mat-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.mat-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    matActive=btn.dataset.mat;
+    matName.textContent=matActive;
+    matProg=buildMatProgram(matShaders[matActive]);
+  });
+});
+
+// ── METRICS COUNTERS ───────────────────────────────────────────────────
+function animateCounter(el){
+  const target=parseFloat(el.dataset.count);
+  const suffix=el.dataset.suffix;
+  const isFloat=target!==Math.floor(target);
+  const dur=2400;
+  let start=null;
+  const step=ts=>{
+    if(!start)start=ts;
+    const p=Math.min((ts-start)/dur,1);
+    const ease=1-Math.pow(1-p,4);
+    const val=ease*target;
+    el.textContent=(isFloat?val.toFixed(1):Math.round(val))+suffix;
+    if(p<1)requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+const counterObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){animateCounter(e.target);counterObs.unobserve(e.target);}});
+},{threshold:.4});
+document.querySelectorAll('[data-count]').forEach(el=>counterObs.observe(el));
+
+// ── GSAP SCROLL ANIMATIONS ─────────────────────────────────────────────
+function initHeroAnims(){
+  // Hero entrance TL
+  const tl=gsap.timeline({delay:.1});
+  tl.to('.hero-eyebrow',{opacity:1,y:0,duration:1,ease:'expo.out'})
+    .to('.hero-word',{
+      y:0,opacity:1,duration:1.4,stagger:.12,ease:'expo.out'
+    },'<.3')
+    .to('.hero-meta',{opacity:1,y:0,duration:1,ease:'expo.out'},'<.6')
+    .to('.scroll-hint',{opacity:1,duration:.8,ease:'power2.out'},'<.3');
+
+  // Nav scroll behavior
+  ScrollTrigger.create({
+    trigger:'#hero',start:'top top',end:'bottom top',
+    onUpdate:self=>{
+      document.getElementById('nav').classList.toggle('scrolled',self.progress>0.05);
+    }
+  });
+
+  // Camera scroll progress
+  ScrollTrigger.create({
+    trigger:'#hero',start:'top top',end:'bottom top',scrub:1.5,
+    onUpdate:self=>{
+      camState.progress=self.progress;
+      if(self.progress>.5){camT=1;camNext=2;}
+      else{camT=0;camNext=1;}
+    }
+  });
+
+  // Manifesto lines — stagger reveal
+  document.querySelectorAll('[data-reveal]').forEach((el,i)=>{
+    gsap.to(el,{
+      y:0,opacity:1,duration:1.1,ease:'expo.out',
+      scrollTrigger:{trigger:el,start:'top 85%',end:'top 50%',toggleActions:'play none none reverse'}
+    });
+  });
+
+  // Manifesto cells pop in
+  document.querySelectorAll('[data-cell]').forEach((el,i)=>{
+    gsap.from(el,{
+      y:40,opacity:0,duration:.9,ease:'expo.out',delay:i*.12,
+      scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none reverse'}
+    });
+  });
+
+  // arch3d title chars
+  const a3title=document.getElementById('arch3d-title');
+  const a3content=document.getElementById('arch3d-content');
+  gsap.from(a3content,{
+    x:-60,opacity:0,duration:1.4,ease:'expo.out',
+    scrollTrigger:{trigger:'#arch3d',start:'top 70%',toggleActions:'play none none reverse'}
+  });
+
+  // Projects — horizontal scroll pin
+  const track=document.getElementById('projects-track');
+  const trackW=track.scrollWidth-track.offsetWidth;
+  gsap.to(track,{
+    x:-trackW,ease:'none',
+    scrollTrigger:{
+      trigger:'#projects',start:'top top',end:`+=${trackW+400}`,
+      scrub:1.2,pin:true,anticipatePin:1,
+    }
+  });
+
+  // Projects title
+  gsap.from('#projects-title',{
+    y:60,opacity:0,duration:1.2,ease:'expo.out',
+    scrollTrigger:{trigger:'#projects',start:'top 80%'}
+  });
+
+  // Metrics section entrance
+  gsap.from('.metric-cell',{
+    y:50,opacity:0,stagger:.12,duration:.9,ease:'expo.out',
+    scrollTrigger:{trigger:'#metrics',start:'top 80%'}
+  });
+
+  // Materials section entrance
+  gsap.from('#mat-canvas-wrap',{
+    x:-80,opacity:0,duration:1.2,ease:'expo.out',
+    scrollTrigger:{trigger:'#materials',start:'top 75%'}
+  });
+  gsap.from('.mat-selector',{
+    x:80,opacity:0,duration:1.2,ease:'expo.out',
+    scrollTrigger:{trigger:'#materials',start:'top 75%'}
+  });
+
+  // CTA reveal
+  gsap.to('#cta-line1',{
+    y:0,opacity:1,duration:1.4,ease:'expo.out',
+    scrollTrigger:{trigger:'#cta',start:'top 70%'}
+  });
+  gsap.to('#cta-line2',{
+    y:0,opacity:1,duration:1.4,ease:'expo.out',delay:.15,
+    scrollTrigger:{trigger:'#cta',start:'top 70%'}
+  });
+  gsap.to('#cta-actions',{
+    opacity:1,y:0,duration:1.1,ease:'expo.out',delay:.4,
+    scrollTrigger:{trigger:'#cta',start:'top 70%'}
+  });
+  gsap.to('#cta-sub',{
+    opacity:1,duration:1.2,delay:.8,
+    scrollTrigger:{trigger:'#cta',start:'top 70%'}
+  });
+
+  // Section eyebrows line grow
+  gsap.utils.toArray('.section-eyebrow-line').forEach(el=>{
+    gsap.from(el,{scaleX:0,transformOrigin:'left center',duration:.9,ease:'expo.out',
+      scrollTrigger:{trigger:el,start:'top 88%',toggleActions:'play none none reverse'}
+    });
+  });
+
+  // Arch3d content — parallax
+  gsap.to('#arch3d-content',{
+    y:-60,ease:'none',
+    scrollTrigger:{trigger:'#arch3d',start:'top bottom',end:'bottom top',scrub:1.5}
+  });
+
+  // Camera position scroll for arch3d
+  ScrollTrigger.create({
+    trigger:'#arch3d',start:'top center',end:'bottom center',scrub:2,
+    onUpdate:self=>{
+      a3cam.position.z=28-self.progress*14;
+      a3cam.position.y=12-self.progress*4;
+    }
+  });
+}
+
+// ── RESIZE ─────────────────────────────────────────────────────────────
+window.addEventListener('resize',()=>{
+  const w=window.innerWidth,h=window.innerHeight;
+  camera.aspect=w/h; camera.updateProjectionMatrix();
+  renderer.setSize(w,h);
+  a3cam.aspect=w/h; a3cam.updateProjectionMatrix();
+  a3r.setSize(w,h);
+  ctaCam.aspect=w/h; ctaCam.updateProjectionMatrix();
+  ctaR.setSize(w,h);
+});
+
+})();
+</script>
+
+<!-- MATERIALS SECTION HTML (rendered after scripts) -->
+<script>
+// Build materials section
+const matSection = document.getElementById('materials');
+if(matSection){
+  matSection.className='section-pad';
+  matSection.innerHTML=`
+    <div class="section-eyebrow"><span class="section-eyebrow-line"></span>MATERIAL LAB</div>
+    <div class="section-title" style="margin-bottom:56px">THE ELEMENTS.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
+      <div id="mat-canvas-wrap" style="height:480px;position:relative;overflow:hidden;background:#111">
+        <canvas id="mat-canvas" style="width:100%;height:100%;display:block"></canvas>
+        <div class="mat-canvas-label">
+          <div class="mat-canvas-eyebrow">MATERIAL PREVIEW</div>
+          <div class="mat-canvas-name">concrete</div>
+        </div>
+      </div>
+      <div class="mat-selector" id="mat-selector">
+        <div class="mat-btn active" data-mat="concrete"><span class="mat-btn-name">Concrete</span><span class="mat-btn-tag">ACTIVE</span></div>
+        <div class="mat-btn" data-mat="marble"><span class="mat-btn-name">Marble</span><span class="mat-btn-tag">ACTIVE</span></div>
+        <div class="mat-btn" data-mat="steel"><span class="mat-btn-name">Steel</span><span class="mat-btn-tag">ACTIVE</span></div>
+        <div class="mat-btn" data-mat="wood"><span class="mat-btn-name">Wood</span><span class="mat-btn-tag">ACTIVE</span></div>
+        <div class="mat-btn" data-mat="glass"><span class="mat-btn-name">Glass</span><span class="mat-btn-tag">ACTIVE</span></div>
+      </div>
+    </div>
+    <p style="margin-top:40px;font-size:12px;color:var(--concrete);line-height:1.8;max-width:480px;font-weight:300">
+      Each material carries time. Concrete absorbs. Marble reflects. Steel conducts. Wood breathes. Glass erases boundaries.
+    </p>
+  `;
+}
+</script>
+
+</html>
